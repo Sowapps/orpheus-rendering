@@ -42,7 +42,7 @@ class HTMLRendering extends Rendering {
 	 */
 	public function display($model=null, $env=array()) {
 		if( $model === NULL ) {
-			throw new Exception("Invalid Rendering Model");
+			throw new \Exception("Invalid Rendering Model");
 		}
 		$rendering = $this->getCurrentRendering();
 		if( $rendering ) {
@@ -51,10 +51,12 @@ class HTMLRendering extends Rendering {
 		}
 		
 		// TODO Merge layoutStack and rendering stack
-		$prevLayouts	= count(static::$layoutStack);
+		$prevLayouts = count(static::$layoutStack);
 		$this->pushToStack($model, $env);
 		
 		extract($env, EXTR_SKIP);
+		// Store this to end layouts
+		static::$current = $this;
 		include static::getModelPath($model);
 		
 		$this->pullFromStack();

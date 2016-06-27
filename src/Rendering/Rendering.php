@@ -17,6 +17,11 @@ abstract class Rendering {
 	
 	protected $renderingStack	= array();
 	
+	/**
+	 * @var Rendering
+	 */
+	protected static $current;
+	
 	protected function pushToStack($model, $env) {
 		$this->renderingStack[] = array($model, $env);
 	}
@@ -222,25 +227,17 @@ abstract class Rendering {
 	 * http://www.php.net/manual/en/function.ob-start.php#refsect1-function.ob-start-parameters
 	 */
 	public static function useLayout($layout) {
-// 		if( static::$layoutStack===NULL ) {
-// 			static::$layoutStack = array();
-// 		}
 		static::$layoutStack[] = $layout;
 		ob_start();
 	}
 	
 	public static function endCurrentLayout($env=array()) {
-// 		text(__FILE__.':'.__LINE__);
-		if( !ob_get_level() || empty(static::$layoutStack) ) { return false; }
-// 		if( ob_get_level() < OBLEVEL_INIT+1 || empty(static::$layoutStack) ) { return false; }
-// 		text(__FILE__.':'.__LINE__);
-// 		$env	= $GLOBALS;
+		if( !ob_get_level() || empty(static::$layoutStack) ) {
+			return false;
+		}
 		$env['Content']	= ob_get_clean();// Ends and returns
-// 		debug('$env', array_keys($env));
-// 		$env['Content'] = ob_get_flush();// Returns and displays
-// 		text(__FILE__.':'.__LINE__);
-		static::doDisplay(array_pop(static::$layoutStack), $env);
-// 		text(__FILE__.':'.__LINE__);
+		static::$current->display(array_pop(static::$layoutStack), $env);
+// 		static::doDisplay(array_pop(static::$layoutStack), $env);
 		return true;
 	}
 }

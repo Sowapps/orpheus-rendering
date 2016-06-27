@@ -14,10 +14,10 @@ class RawRendering extends Rendering {
 	 * @see Rendering::render()
 	 */
 	public function render($model=null, $env=array()) {
-		extract($env);
-		if( !isset($Page) ) {
-			$Page = '';
-		}
-		return $Page;
+// 		extract($env);
+// 		if( !isset($Page) ) {
+// 			$Page = '';
+// 		}
+		return isset($env['CONTROLLER_OUTPUT']) ? $env['CONTROLLER_OUTPUT'] : '';
 	}
 }
