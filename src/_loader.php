@@ -4,6 +4,11 @@ use Orpheus\Hook\Hook;
 /* Loader File for the rendering sources
  */
 
+if( !defined('ORPHEUSPATH') ) {
+	// Do not load in a non-orpheus environment
+	return;
+}
+
 // addAutoload('Rendering',		'rendering/Rendering');
 // addAutoload('HTMLRendering',	'rendering/HTMLRendering');
 // addAutoload('RawRendering',		'rendering/RawRendering');
