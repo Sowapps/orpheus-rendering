@@ -1,4 +1,8 @@
 <?php
+/**
+ * RawRendering
+ */
+
 namespace Orpheus\Rendering;
 
 /**
@@ -9,15 +13,11 @@ namespace Orpheus\Rendering;
 class RawRendering extends Rendering {
 	
 	/**
-	 * Render the model.
 	 * 
-	 * @see Rendering::render()
+	 * {@inheritDoc}
+	 * @see \Orpheus\Rendering\Rendering::render()
 	 */
 	public function render($model=null, $env=array()) {
-// 		extract($env);
-// 		if( !isset($Page) ) {
-// 			$Page = '';
-// 		}
 		return isset($env['CONTROLLER_OUTPUT']) ? $env['CONTROLLER_OUTPUT'] : '';
 	}
 }

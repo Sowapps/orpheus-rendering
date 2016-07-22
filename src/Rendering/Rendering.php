@@ -1,4 +1,8 @@
 <?php
+/**
+ * Rendering
+ */
+
 namespace Orpheus\Rendering;
 
 use Orpheus\Config\Config;
@@ -7,14 +11,37 @@ use Orpheus\Core\Route;
 
 /**
  * The rendering class
+ * 
  * This class is the core for custom rendering use.
 */
 abstract class Rendering {
 	
+	/**
+	 * The default model to show
+	 * 
+	 * @var string
+	 */
 	protected static $SHOWMODEL = 'show';
+	
+	/**
+	 * The current Rendering
+	 * 
+	 * @var Rendering
+	 */
 	protected static $rendering;
+	
+	/**
+	 * The configuration of the menu
+	 * 
+	 * @var array
+	 */
 	protected static $menusConf;
 	
+	/**
+	 * The current rendering stack
+	 * 
+	 * @var array
+	 */
 	protected $renderingStack	= array();
 	
 	/**
@@ -22,40 +49,59 @@ abstract class Rendering {
 	 */
 	protected static $current;
 	
+	/**
+	 * Push rendering to stack
+	 * 
+	 * @param string $model
+	 * @param array $env
+	 */
 	protected function pushToStack($model, $env) {
 		$this->renderingStack[] = array($model, $env);
 	}
 	
+	/**
+	 * Get current rendering
+	 * 
+	 * @return array array($model, $env);
+	 */
 	protected function getCurrentRendering() {
 		return array_last($this->renderingStack);
 	}
 	
+	/**
+	 * Remove current rendering and get to previous one
+	 */
 	protected function pullFromStack() {
 		array_pop($this->renderingStack);
 	}
 	
-	/** Renders the model
-	 * @param $model The model to use, default use is defined by child.
-	 * @param $env An environment variable, commonly an array but depends on the rendering class used.
+	/**
+	 * Render the model
+	 * 
+	 * @param string $model The model to use, default use is defined by child.
+	 * @param array $env An environment variable, commonly an array but depends on the rendering class used.
 	 * @return The generated rendering.
 	 * 
-	 * Renders the model using $env.
+	 * Render the model using $env.
 	 * This function does not display the result, see display().
 	 */
 	public abstract function render($model=null, $env=array());
 	
-	/** Displays rendering
-	 * @param $model The model to use.
-	 * @param $env An environment variable.
+	/**
+	 * Display rendering
+	 * @param string $model The model to use.
+	 * @param array $env An environment variable.
 	 * 
-	 * Displays the model rendering using $env.
+	 * Display the model rendering using $env.
 	 */
 	public function display($model=null, $env=array()) {
 		echo $this->render($model, $env);
 	}
 
-	/** Get menu items
-	 * @param $menu The menu to get items
+	/**
+	 * Get menu items
+	 * 
+	 * @param string $menu The menu to get items
 	 * @return string[] The menu items
 	 */
 	public function getMenuItems($menu) {
@@ -68,28 +114,16 @@ abstract class Rendering {
 		return self::$menusConf->$menu;
 	}
 	
-	/** Show menu.
-	 * @param $menu string The menu name
-	 * @param $layout string the layout to use
-	 * @param $active Active item
+	/**
+	 * Show the $menu
 	 * 
-	 * Displays the $menu.
+	 * @param string $menu The menu name
+	 * @param string $layout the layout to use
+	 * @param string $active Active item
 	 */
 	public function showMenu($menu, $layout=null, $active=null) {
-// 		self::checkRendering();
-// 		global $USER_CLASS;
-// 		$HAS_USER_CLASS	= isset($USER_CLASS) && class_exists($USER_CLASS);
-// 		$HAS_USER_CLASS	= class_exists('User');
-// 		if( !class_exists($USER_CLASS) ) { return false; }
 		
-		$currentRoute	= $active ? $active : get_current_route();
-// 		if( $active!==NULL ) {
-// // 			list($currentRoute, $currentAction) = explodeList('-', $active, 2);
-// 			$currentRoute	= $active;
-// 		} else {
-// 			$currentRoute	= !empty($GLOBALS['MenuModule']) ? $GLOBALS['MenuModule'] : $GLOBALS['Module'];
-// // 			$currentAction	= &$GLOBALS['Action'];
-// 		}
+		$currentRoute = $active ? $active : get_current_route();
 		
 		if( $layout===NULL ) {
 			$layout	= defined('LAYOUT_MENU') ? LAYOUT_MENU : 'menu-default';
@@ -105,13 +139,9 @@ abstract class Rendering {
 				list($item->link, $item->label) = explode('|', substr($itemConf, 1));
 			} else {
 				// TODO: Allow {var:value} for values, or use a YAML config ?
-// 				$itemConf	= explode('-', $itemConf);
-// 				$route		= $itemConf[0];
 				$routeName = $itemConf;
-// 				if( !DEV_VERSION && !exists_route($route) ) { continue; }
 				
 				/* @var $route HTTPRoute */
-// 				$route	= HTTPRoute::getRoute($routeName);
 				$route = Route::getRoute($routeName);
 				
 				// Does not exist
@@ -137,11 +167,13 @@ abstract class Rendering {
 		$this->display($layout, $env);
 	}
 	
-	/** Shows the rendering using a child rendering class.
-	 * @param $env An environment variable.
-	 * @attention Require the use of a child class, you can not instantiate this one.
+	/**
+	 * Show the rendering using a child rendering class
 	 * 
-	 * Shows the $SHOWMODEL rendering using the child class.
+	 * @param $env An environment variable
+	 * @attention Require the use of a child class, you can not instantiate this one
+	 * 
+	 * Show the $SHOWMODEL rendering using the child class.
 	 * A call to this function terminate the running script.
 	 * Default is the global environment.
 	 */
@@ -156,34 +188,44 @@ abstract class Rendering {
 		exit();
 	}
 	
-	/** Calls the show function.
+	/**
+	 * Call the show function
+	 * 
 	 * @see show()
+	 * 
 	 * Calls the show function using the 'default_rendering' configuration.
+	 * We should not use it anymore
 	 */
 	final public static function doShow() {
 		$c = self::checkRendering();
 		$c::show();
 	}
 	
-	/** Calls the render function.
-	 * @param $env An environment variable.
-	 * @param $model The model to use.
-	 * @return The generated rendering.
+	/**
+	 * Call the render function
+	 * 
+	 * @param $env An environment variable
+	 * @param $model The model to use
+	 * @return The generated rendering
 	 * @see render()
 	 * 
-	 * Calls the render function using the 'default_rendering' configuration.
+	 * Call the render function using the 'default_rendering' configuration.
+	 * We should not use it anymore
 	 */
 	final public static function doRender($model=null, $env=array()) {
 		self::checkRendering();
 		return self::$rendering->render($model, $env);
 	}
 	
-	/** Calls the display function.
-	 * @param $model The model to use. Default value is null (behavior depending on renderer).
-	 * @param $env An array containing environment variables. Default value is null ($GLOBALS).
+	/**
+	 * Call the display function
+	 * 
+	 * @param $model The model to use. Default value is null (behavior depending on renderer)
+	 * @param $env An array containing environment variables. Default value is null ($GLOBALS)
 	 * @see display()
 	 * 
 	 * Calls the display function using the 'default_rendering' configuration.
+	 * We should not use it anymore
 	 */
 	final public static function doDisplay($model=null, $env=null) {
 		self::checkRendering();
@@ -194,8 +236,10 @@ abstract class Rendering {
 		return true;
 	}
 	
-	/** Checks the rendering
-	 * Checks the rendering and try to create a valid one.
+	/**
+	 * Ensure the current rendering
+	 * 
+	 * Check the rendering and try to create a valid one if not found.
 	 */
 	final private static function checkRendering() {
 		if( self::$rendering===NULL ) {
@@ -213,11 +257,17 @@ abstract class Rendering {
 		}
 		return get_class(self::$rendering);
 	}
-
-// 	protected static $layoutStack = null;
+	
+	/**
+	 * The rendering layout stack
+	 * 
+	 * @var array
+	 */
 	protected static $layoutStack = array();
 	
-	/** Use layout until the next endCurrentLayout()
+	/**
+	 * Use layout until the next endCurrentLayout()
+	 * 
 	 * @param $layout The layout to use.
 	 * @see endCurrentLayout()
 	 * 
@@ -231,13 +281,18 @@ abstract class Rendering {
 		ob_start();
 	}
 	
+	/**
+	 * End the current layout
+	 * 
+	 * @param array $env The environement to render the layout
+	 * @return boolean False if there is no current layout
+	 */
 	public static function endCurrentLayout($env=array()) {
 		if( !ob_get_level() || empty(static::$layoutStack) ) {
 			return false;
 		}
 		$env['Content']	= ob_get_clean();// Ends and returns
 		static::$current->display(array_pop(static::$layoutStack), $env);
-// 		static::doDisplay(array_pop(static::$layoutStack), $env);
 		return true;
 	}
 }
