@@ -86,6 +86,8 @@ class HTMLRendering extends Rendering {
 	 * 
 	 * {@inheritDoc}
 	 * @see \Orpheus\Rendering\Rendering::render()
+	 * @param string $model The model to use, default use is defined by child
+	 * @param array $env An environment variable, commonly an array but depends on the rendering class used
 	 */
 	public function render($model=null, $env=array()) {
 		ob_start();
@@ -98,6 +100,8 @@ class HTMLRendering extends Rendering {
 	 * 
 	 * {@inheritDoc}
 	 * @see \Orpheus\Rendering\Rendering::display()
+	 * @param string $model The model to use
+	 * @param array $env An environment variable
 	 */
 	public function display($model=null, $env=array()) {
 		if( $model === NULL ) {
@@ -188,7 +192,7 @@ class HTMLRendering extends Rendering {
 	/**
 	 * Add a css url to the list
 	 * 
-	 * @param string $filename
+	 * @param string $url
 	 * @param string $type
 	 */
 	public static function addCSSURL($url, $type=null) {
@@ -218,7 +222,7 @@ class HTMLRendering extends Rendering {
 	/**
 	 * Add a js url to the list
 	 *
-	 * @param string $filename
+	 * @param string $url
 	 * @param string $type
 	 */
 	public static function addJSURL($url, $type=null) {

@@ -45,6 +45,8 @@ abstract class Rendering {
 	protected $renderingStack	= array();
 	
 	/**
+	 * The current global rendering
+	 * 
 	 * @var Rendering
 	 */
 	protected static $current;
@@ -78,8 +80,8 @@ abstract class Rendering {
 	/**
 	 * Render the model
 	 * 
-	 * @param string $model The model to use, default use is defined by child.
-	 * @param array $env An environment variable, commonly an array but depends on the rendering class used.
+	 * @param string $model The model to use, default use is defined by child
+	 * @param array $env An environment variable, commonly an array but depends on the rendering class used
 	 * @return The generated rendering.
 	 * 
 	 * Render the model using $env.
@@ -89,8 +91,9 @@ abstract class Rendering {
 	
 	/**
 	 * Display rendering
-	 * @param string $model The model to use.
-	 * @param array $env An environment variable.
+	 * 
+	 * @param string $model The model to use
+	 * @param array $env An environment variable
 	 * 
 	 * Display the model rendering using $env.
 	 */
@@ -204,9 +207,9 @@ abstract class Rendering {
 	/**
 	 * Call the render function
 	 * 
-	 * @param $env An environment variable
-	 * @param $model The model to use
-	 * @return The generated rendering
+	 * @param string $model The model to use
+	 * @param array $env An environment variable
+	 * @return string The generated rendering
 	 * @see render()
 	 * 
 	 * Call the render function using the 'default_rendering' configuration.
@@ -220,8 +223,9 @@ abstract class Rendering {
 	/**
 	 * Call the display function
 	 * 
-	 * @param $model The model to use. Default value is null (behavior depending on renderer)
-	 * @param $env An array containing environment variables. Default value is null ($GLOBALS)
+	 * @param string $model The model to use. Default value is null (behavior depending on renderer)
+	 * @param array $env An array containing environment variables. Default value is null ($GLOBALS)
+	 * @return boolean
 	 * @see display()
 	 * 
 	 * Calls the display function using the 'default_rendering' configuration.
@@ -238,6 +242,8 @@ abstract class Rendering {
 	
 	/**
 	 * Ensure the current rendering
+	 * 
+	 * @return string The rendering class name
 	 * 
 	 * Check the rendering and try to create a valid one if not found.
 	 */
