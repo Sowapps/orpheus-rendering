@@ -82,7 +82,7 @@ abstract class Rendering {
 	 * 
 	 * @param string $model The model to use, default use is defined by child
 	 * @param array $env An environment variable, commonly an array but depends on the rendering class used
-	 * @return The generated rendering.
+	 * @return string The generated rendering.
 	 * 
 	 * Render the model using $env.
 	 * This function does not display the result, see display().
@@ -173,7 +173,7 @@ abstract class Rendering {
 	/**
 	 * Show the rendering using a child rendering class
 	 * 
-	 * @param $env An environment variable
+	 * @param array $env An environment variable
 	 * @attention Require the use of a child class, you can not instantiate this one
 	 * 
 	 * Show the $SHOWMODEL rendering using the child class.
@@ -274,7 +274,7 @@ abstract class Rendering {
 	/**
 	 * Use layout until the next endCurrentLayout()
 	 * 
-	 * @param $layout The layout to use.
+	 * @param string $layout The layout to use.
 	 * @see endCurrentLayout()
 	 * 
 	 * Use layout until the next endCurrentLayout() is encountered.

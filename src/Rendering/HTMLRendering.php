@@ -308,7 +308,7 @@ class HTMLRendering extends Rendering {
 	/**
 	 * Get the theme path.
 	 * 
-	 * @return The theme path
+	 * @return string The theme path
 	 * 
 	 * Get the path to the current theme.
 	 */
@@ -319,7 +319,7 @@ class HTMLRendering extends Rendering {
 	/** 
 	 * Get the absolute theme path.
 	 *
-	 * @return The theme path.
+	 * @return string The theme path.
 	 *
 	 * Get the absolute path to the current theme.
 	 */
