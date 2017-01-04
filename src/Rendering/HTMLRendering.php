@@ -90,7 +90,7 @@ class HTMLRendering extends Rendering {
 	public $layoutsPath		= 'layouts/';
 	
 	public function __construct() {
-		$this->theme = static::getDefaultTheme;
+		$this->theme = static::getDefaultTheme();
 	}
 	
 	/**
@@ -154,7 +154,7 @@ class HTMLRendering extends Rendering {
 	 * @return string $theme
 	 */
 	public static function getDefaultTheme() {
-		return static::$theme;
+		return static::$defaultTheme;
 	}
 	
 	/**
