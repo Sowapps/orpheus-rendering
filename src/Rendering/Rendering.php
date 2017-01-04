@@ -54,17 +54,17 @@ abstract class Rendering {
 	/**
 	 * Push rendering to stack
 	 * 
-	 * @param string $model
+	 * @param string $layout
 	 * @param array $env
 	 */
-	protected function pushToStack($model, $env) {
-		$this->renderingStack[] = array($model, $env);
+	protected function pushToStack($layout, $env) {
+		$this->renderingStack[] = array($layout, $env);
 	}
 	
 	/**
 	 * Get current rendering
 	 * 
-	 * @return array array($model, $env);
+	 * @return array array($layout, $env);
 	 */
 	protected function getCurrentRendering() {
 		return array_last($this->renderingStack);
@@ -80,25 +80,25 @@ abstract class Rendering {
 	/**
 	 * Render the model
 	 * 
-	 * @param string $model The model to use, default use is defined by child
+	 * @param string $layout The layout to use, default use is defined by child
 	 * @param array $env An environment variable, commonly an array but depends on the rendering class used
 	 * @return string The generated rendering.
 	 * 
 	 * Render the model using $env.
 	 * This function does not display the result, see display().
 	 */
-	public abstract function render($model=null, $env=array());
+	public abstract function render($layout=null, $env=array());
 	
 	/**
 	 * Display rendering
 	 * 
-	 * @param string $model The model to use
+	 * @param string $layout The layout to use
 	 * @param array $env An environment variable
 	 * 
 	 * Display the model rendering using $env.
 	 */
-	public function display($model=null, $env=array()) {
-		echo $this->render($model, $env);
+	public function display($layout=null, $env=array()) {
+		echo $this->render($layout, $env);
 	}
 
 	/**
@@ -207,7 +207,7 @@ abstract class Rendering {
 	/**
 	 * Call the render function
 	 * 
-	 * @param string $model The model to use
+	 * @param string $layout The model to use
 	 * @param array $env An environment variable
 	 * @return string The generated rendering
 	 * @see render()
@@ -215,15 +215,15 @@ abstract class Rendering {
 	 * Call the render function using the 'default_rendering' configuration.
 	 * We should not use it anymore
 	 */
-	final public static function doRender($model=null, $env=array()) {
+	final public static function doRender($layout=null, $env=array()) {
 		self::checkRendering();
-		return self::$rendering->render($model, $env);
+		return self::$rendering->render($layout, $env);
 	}
 	
 	/**
 	 * Call the display function
 	 * 
-	 * @param string $model The model to use. Default value is null (behavior depending on renderer)
+	 * @param string $layout The model to use. Default value is null (behavior depending on renderer)
 	 * @param array $env An array containing environment variables. Default value is null ($GLOBALS)
 	 * @return boolean
 	 * @see display()
@@ -231,12 +231,12 @@ abstract class Rendering {
 	 * Calls the display function using the 'default_rendering' configuration.
 	 * We should not use it anymore
 	 */
-	final public static function doDisplay($model=null, $env=null) {
+	final public static function doDisplay($layout=null, $env=null) {
 		self::checkRendering();
 		if( !isset(self::$rendering) ) { return false; }
 		if( $env === NULL ) { $env = $GLOBALS; }
-// 		debug('doDisplay('.$model.', $env)', array_keys($env));
-		self::$rendering->display($model, $env);
+// 		debug('doDisplay('.$layout.', $env)', array_keys($env));
+		self::$rendering->display($layout, $env);
 		return true;
 	}
 	
@@ -262,6 +262,11 @@ abstract class Rendering {
 			self::$rendering = new $c();
 		}
 		return get_class(self::$rendering);
+	}
+	
+	public static function getDefaultRendering() {
+		static::checkRendering();
+		return self::$rendering;
 	}
 	
 	/**
