@@ -297,6 +297,15 @@ class HTMLRendering extends Rendering {
 	}
 	
 	/**
+	 * List all registered html meta properties
+	 * 
+	 * @return array
+	 */
+	public function listMetaProperties() {
+		return $this->metaprop;
+	}
+	
+	/**
 	 * Add an $url by $type in $array
 	 * 
 	 * @param array $array
