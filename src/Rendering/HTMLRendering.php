@@ -352,7 +352,7 @@ class HTMLRendering extends Rendering {
 	 * @param string $theme
 	 */
 	public static function setTheme($theme) {
-		static::$theme = $theme;
+		$this->theme = $theme;
 	}
 	
 	/**
