@@ -145,7 +145,7 @@ class HTMLRendering extends Rendering {
 	 * @param string $theme
 	 */
 	public static function setDefaultTheme($theme) {
-		static::$theme = $theme;
+		static::$defaultTheme = $theme;
 	}
 	
 	/**
@@ -335,6 +335,15 @@ class HTMLRendering extends Rendering {
 		}
 		$array = array();
 		return $r;
+	}
+	
+	/**
+	 * Set the theme used to render layouts
+	 * 
+	 * @param string $theme
+	 */
+	public static function setTheme($theme) {
+		static::$theme = $theme;
 	}
 	
 	/**
