@@ -185,8 +185,9 @@ abstract class Rendering {
 			$env = $GLOBALS;
 		}
 
-		self::checkRendering();
-		self::$rendering->display(static::$SHOWMODEL, $env);
+// 		self::checkRendering();
+// 		self::$rendering->display(static::$SHOWMODEL, $env);
+		static::$current->display(static::$SHOWMODEL, $env);
 		
 		exit();
 	}
@@ -200,8 +201,9 @@ abstract class Rendering {
 	 * We should not use it anymore
 	 */
 	final public static function doShow() {
-		$c = self::checkRendering();
-		$c::show();
+// 		$c = self::checkRendering();
+// 		$c::show();
+		static::$current->show();
 	}
 	
 	/**
@@ -216,8 +218,9 @@ abstract class Rendering {
 	 * We should not use it anymore
 	 */
 	final public static function doRender($layout=null, $env=array()) {
-		self::checkRendering();
-		return self::$rendering->render($layout, $env);
+// 		self::checkRendering();
+// 		return self::$rendering->render($layout, $env);
+		return static::$current->render($layout, $env);
 	}
 	
 	/**
@@ -232,11 +235,11 @@ abstract class Rendering {
 	 * We should not use it anymore
 	 */
 	final public static function doDisplay($layout=null, $env=null) {
-		self::checkRendering();
-		if( !isset(self::$rendering) ) { return false; }
+// 		self::checkRendering();
+// 		if( !isset(self::$rendering) ) { return false; }
 		if( $env === NULL ) { $env = $GLOBALS; }
 // 		debug('doDisplay('.$layout.', $env)', array_keys($env));
-		self::$rendering->display($layout, $env);
+		static::$current->display($layout, $env);
 		return true;
 	}
 	
@@ -247,27 +250,27 @@ abstract class Rendering {
 	 * 
 	 * Check the rendering and try to create a valid one if not found.
 	 */
-	final private static function checkRendering() {
-		if( self::$rendering===NULL ) {
-			if( class_exists('Config') ) {
-				$c = Config::get('default_rendering');
-			}
-			if( !isset($c) ) {
-				$c = defined("TERMINAL") ? 'RawRendering' : 'HTMLRendering';
-			}
-			if( !class_exists($c) ) {
-				log_error('Rendering class "'.$c.'" should be loaded : '.print_r(debug_backtrace(), 1));
-				die();
-			}
-			self::$rendering = new $c();
-		}
-		return get_class(self::$rendering);
-	}
+// 	final private static function checkRendering() {
+// 		if( self::$rendering===NULL ) {
+// 			if( class_exists('Config') ) {
+// 				$c = Config::get('default_rendering');
+// 			}
+// 			if( !isset($c) ) {
+// 				$c = defined("TERMINAL") ? 'RawRendering' : 'HTMLRendering';
+// 			}
+// 			if( !class_exists($c) ) {
+// 				log_error('Rendering class "'.$c.'" should be loaded : '.print_r(debug_backtrace(), 1));
+// 				die();
+// 			}
+// 			self::$rendering = new $c();
+// 		}
+// 		return get_class(self::$rendering);
+// 	}
 	
-	public static function getDefaultRendering() {
-		static::checkRendering();
-		return self::$rendering;
-	}
+// 	public static function getDefaultRendering() {
+// 		static::checkRendering();
+// 		return self::$rendering;
+// 	}
 	
 	/**
 	 * The rendering layout stack
