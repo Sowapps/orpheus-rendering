@@ -42,7 +42,7 @@ abstract class Rendering {
 	 * 
 	 * @var array
 	 */
-	protected $renderingStack	= array();
+	protected $renderingStack = array();
 	
 	/**
 	 * The current global rendering
