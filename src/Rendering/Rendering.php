@@ -168,11 +168,13 @@ abstract class Rendering {
 					
 					$item = new MenuItem(u($routeName), t($routeName));
 					$item->setRoute($routeName);
-					if( $item->getLink() === $activeLink ) {
-						$item->setActive();
-					}
 				}
 				$env['items'][] = $item;
+			}
+		}
+		foreach( $env['items'] as $item) {
+			if( $activeLink === $item->getLink() ) {
+				$item->setActive();
 			}
 		}
 		$this->display($layout, $env);
