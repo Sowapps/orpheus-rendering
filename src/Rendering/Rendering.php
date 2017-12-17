@@ -288,6 +288,9 @@ abstract class Rendering {
 	 * @return Rendering
 	 */
 	public static function getCurrent() {
-		return self::$current;
+		if( !static::$current ) {
+			static::$current = new static();
+		}
+		return static::$current;
 	}
 }

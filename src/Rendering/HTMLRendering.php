@@ -89,6 +89,13 @@ class HTMLRendering extends Rendering {
 	 */
 	public $layoutsPath		= 'layouts/';
 	
+	/**
+	 * The current global rendering
+	 *
+	 * @var Rendering
+	 */
+	protected static $current;
+	
 	public function __construct() {
 		$this->theme = static::getDefaultTheme();
 	}
@@ -118,6 +125,8 @@ class HTMLRendering extends Rendering {
 		if( $layout === NULL ) {
 			throw new \Exception("Invalid Rendering Model");
 		}
+		// Store this to end layouts, static because ob_* functions are globals
+		static::$current = $this;
 		$rendering = $this->getCurrentRendering();
 		if( $rendering ) {
 			$env += $rendering[1];
@@ -128,8 +137,6 @@ class HTMLRendering extends Rendering {
 		$this->pushToStack($layout, $env);
 		
 		extract($env, EXTR_SKIP);
-		// Store this to end layouts, static because ob_* functions are globals
-		static::$current = $this;
 		include $this->getLayoutPath($layout);
 		
 		$this->pullFromStack();
