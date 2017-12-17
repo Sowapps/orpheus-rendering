@@ -283,4 +283,11 @@ abstract class Rendering {
 		static::$current->display(array_pop(static::$layoutStack), $env);
 		return true;
 	}
+	
+	/**
+	 * @return Rendering
+	 */
+	public static function getCurrent() {
+		return self::$current;
+	}
 }
