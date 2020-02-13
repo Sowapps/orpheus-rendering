@@ -24,6 +24,11 @@ class MenuItem {
 	 */
 	protected $isActive;
 	
+	/**
+	 * @var boolean
+	 */
+	protected $isGroup = false;
+	
 	public function __construct($link, $label) {
 		$this->setLink($link);
 		$this->setLabel($label);
