@@ -75,7 +75,7 @@ abstract class Rendering {
 		if( $layout === null ) {
 			$layout = defined('LAYOUT_MENU') ? LAYOUT_MENU : 'menu-default';
 		}
-		if( !$activeLink === null ) {
+		if( $activeLink === null ) {
 			$activeLink = get_current_link();
 		}
 		
@@ -115,7 +115,7 @@ abstract class Rendering {
 				/* @var $route HTTPRoute */
 				$route = Route::getRoute($routeName);
 				
-				// Does not exist or is not acessible
+				// Does not exist or is not accessible
 				if( !$route || !$route->isAccessible() ) {
 					continue;
 				}
