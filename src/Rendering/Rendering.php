@@ -293,7 +293,7 @@ abstract class Rendering {
 	 * @param $name
 	 * @throws Exception
 	 */
-	public static function startNewBlock($name) {
+	public function startNewBlock($name) {
 		//End current block
 		$result = static::endCapture();// Ends and returns
 		$capture = array_last(static::$layoutStack);
