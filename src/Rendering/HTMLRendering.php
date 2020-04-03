@@ -6,6 +6,7 @@
 namespace Orpheus\Rendering;
 
 use Exception;
+use Orpheus\Config\IniConfig;
 
 /**
  * The HTML rendering class
@@ -33,7 +34,7 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @var string
 	 */
-	public static $defaultTheme = 'default';
+	public static $defaultTheme;
 	
 	/**
 	 * The default model to show
@@ -121,6 +122,9 @@ class HTMLRendering extends Rendering {
 	 * @return string $theme
 	 */
 	public static function getDefaultTheme() {
+		if( !static::$defaultTheme ) {
+			static::$defaultTheme = IniConfig::get('default_html_theme', 'default');
+		}
 		return static::$defaultTheme;
 	}
 	
@@ -181,6 +185,20 @@ class HTMLRendering extends Rendering {
 	}
 	
 	/**
+	 * @return bool
+	 */
+	public function isRemote() {
+		return $this->remote;
+	}
+	
+	/**
+	 * @param bool $remote
+	 */
+	public function setRemote($remote) {
+		$this->remote = $remote;
+	}
+	
+	/**
 	 * Get the CSS files url
 	 *
 	 * @return string The CSS url
@@ -227,6 +245,41 @@ class HTMLRendering extends Rendering {
 	}
 	
 	/**
+	 * Get the css theme path
+	 *
+	 * @return string The css theme path
+	 */
+	public function getCssPath() {
+		return $this->getThemePath() . $this->cssPath;
+	}
+	
+	/**
+	 * Get the theme path.
+	 *
+	 * @return string The theme path
+	 *
+	 * Get the path to the current theme.
+	 */
+	public function getThemePath() {
+		return $this->getResourcePath() . THEMES_FOLDER . '/' . $this->theme . '/';
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getResourcePath() {
+		return $this->resourcePath;
+	}
+	
+	/**
+	 * @param string $resourcePath
+	 */
+	public function setResourcePath(string $resourcePath) {
+		$this->resourcePath = $resourcePath;
+		return $this;
+	}
+	
+	/**
 	 * Add a theme js file to the list
 	 *
 	 * @param string $filename
@@ -253,6 +306,15 @@ class HTMLRendering extends Rendering {
 	 */
 	public function getJsUrl() {
 		return $this->getThemeUrl() . $this->jsPath;
+	}
+	
+	/**
+	 * Get the js theme path
+	 *
+	 * @return string The JS theme path
+	 */
+	public function getJsPath() {
+		return $this->getThemePath() . $this->jsPath;
 	}
 	
 	/**
@@ -349,32 +411,6 @@ class HTMLRendering extends Rendering {
 	}
 	
 	/**
-	 * Get the theme path.
-	 *
-	 * @return string The theme path
-	 *
-	 * Get the path to the current theme.
-	 */
-	public function getThemePath() {
-		return $this->getResourcePath() . THEMES_FOLDER . '/' . $this->theme . '/';
-	}
-	
-	/**
-	 * @return string
-	 */
-	public function getResourcePath() {
-		return $this->resourcePath;
-	}
-	
-	/**
-	 * @param string $resourcePath
-	 */
-	public function setResourcePath(string $resourcePath) {
-		$this->resourcePath = $resourcePath;
-		return $this;
-	}
-	
-	/**
 	 * Get the models theme path
 	 *
 	 * @return string The models theme path
@@ -394,42 +430,10 @@ class HTMLRendering extends Rendering {
 	}
 	
 	/**
-	 * Get the css theme path
-	 *
-	 * @return string The css theme path
-	 */
-	public function getCssPath() {
-		return $this->getThemePath() . $this->cssPath;
-	}
-	
-	/**
-	 * Get the js theme path
-	 *
-	 * @return string The JS theme path
-	 */
-	public function getJsPath() {
-		return $this->getThemePath() . $this->jsPath;
-	}
-	
-	/**
 	 * @return int
 	 */
 	public function getRenderingId() {
 		return $this->renderingId;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	public function isRemote() {
-		return $this->remote;
-	}
-	
-	/**
-	 * @param bool $remote
-	 */
-	public function setRemote($remote) {
-		$this->remote = $remote;
 	}
 	
 	/**
