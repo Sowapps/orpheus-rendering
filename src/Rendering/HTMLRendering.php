@@ -324,7 +324,7 @@ class HTMLRendering extends Rendering {
 	 * @param string $type
 	 */
 	public function addJsFile($filename, $type = null) {
-		$this->addJsUrl(JSURL . $filename, $type);
+		$this->addJsUrl(JS_URL . '/' . $filename, $type);
 	}
 	
 	/**
