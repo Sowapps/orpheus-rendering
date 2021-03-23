@@ -275,7 +275,7 @@ abstract class Rendering {
 	 * Warning: According to the ob_start() documentation, you can't call functions using output buffering in your layout.
 	 * http://www.php.net/manual/en/function.ob-start.php#refsect1-function.ob-start-parameters
 	 */
-	public function useLayout($layout, $block = 'Content') {
+	public function useLayout($layout, $block = 'content') {
 		static::$layoutStack[] = (object) ['layout' => $layout, 'block' => $block, 'caughtBlocks' => []];
 		static::captureOutput();
 	}

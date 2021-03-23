@@ -504,7 +504,7 @@ class HTMLRendering extends Rendering {
 	 * @param array $env An environment variable
 	 */
 	public function display($layout = null, $env = []) {
-		if( $layout === null ) {
+		if( !$layout ) {
 			throw new Exception('Invalid Rendering Model');
 		}
 		$this->renderingId++;
@@ -521,13 +521,27 @@ class HTMLRendering extends Rendering {
 		// Variable for included template
 		$rendering = $this;
 		
-		// Store this to end layouts, static because ob_* functions are globals
-		include $this->getLayoutPath($layout);
-		
-		$this->pullFromStack();
-		$currentLayouts = count(static::$layoutStack);
-		while( $currentLayouts > $prevLayouts && static::endCurrentLayout($env) ) {
-			$currentLayouts--;
+		$interrupted = false;
+		try {
+			// Store this to end layouts, static because ob_* functions are globals
+			include $this->getLayoutPath($layout);
+		} catch( Exception $e ) {
+			// Exception interrupts all layout's stack and only this rendering stack
+			$interrupted = true;
+			throw $e;
+		} finally {
+			$this->pullFromStack();
+			$currentLayouts = count(static::$layoutStack);
+			while( $currentLayouts > $prevLayouts ) {
+				// If interrupted, we just end started layout's capture
+				$result = $interrupted ? static::endCapture() : static::endCurrentLayout($env);
+				if( $result ) {
+					$currentLayouts--;
+				} else {
+					// In fact, there is not more capture in progress
+					break;
+				}
+			}
 		}
 	}
 	
