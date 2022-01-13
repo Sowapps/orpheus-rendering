@@ -7,7 +7,6 @@ namespace Orpheus\Rendering;
 
 use Exception;
 use Orpheus\Config\IniConfig;
-use Orpheus\Core\Route;
 use Orpheus\InputController\HTTPController\HTTPRequest;
 use Orpheus\InputController\HTTPController\HTTPRoute;
 use Orpheus\Rendering\Menu\MenuItem;
@@ -113,7 +112,7 @@ abstract class Rendering {
 				$routeName = $itemConf;
 				
 				/* @var $route HTTPRoute */
-				$route = Route::getRoute($routeName);
+				$route = HTTPRoute::getRoute($routeName);
 				
 				// Does not exist or is not accessible
 				if( !$route || !$route->isAccessible() ) {
