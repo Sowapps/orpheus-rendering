@@ -7,8 +7,8 @@ namespace Orpheus\Rendering;
 
 use Exception;
 use Orpheus\Config\IniConfig;
-use Orpheus\InputController\HTTPController\HTTPRequest;
-use Orpheus\InputController\HTTPController\HTTPRoute;
+use Orpheus\InputController\HttpController\HttpRequest;
+use Orpheus\InputController\HttpController\HttpRoute;
 use Orpheus\Rendering\Menu\MenuItem;
 
 /**
@@ -78,7 +78,7 @@ abstract class Rendering {
 			$activeLink = get_current_link();
 		}
 		
-		$controller = HTTPRequest::getMainHTTPRequest()->getController();
+		$controller = HttpRequest::getMainHttpRequest()->getController();
 		$controllerValues = $controller->getValues();
 		$env = ['menu' => $menu, 'items' => []];
 		$items = $this->getMenuItems($menu);
@@ -111,8 +111,8 @@ abstract class Rendering {
 				// TODO: Allow {var:value} for values, or use a YAML config ?
 				$routeName = $itemConf;
 				
-				/* @var $route HTTPRoute */
-				$route = HTTPRoute::getRoute($routeName);
+				/* @var $route HttpRoute */
+				$route = HttpRoute::getRoute($routeName);
 				
 				// Does not exist or is not accessible
 				if( !$route || !$route->isAccessible() ) {
