@@ -24,7 +24,7 @@ abstract class Rendering {
 	 *
 	 * @var Rendering
 	 */
-	protected static Rendering $current;
+	protected static $current = null;
 	
 	/**
 	 * The configuration of the menu
@@ -167,10 +167,10 @@ abstract class Rendering {
 	/**
 	 * Get current rendering
 	 *
-	 * @return array array($layout, $env);
+	 * @return array|null array($layout, $env);
 	 */
-	protected function getCurrentRendering(): array {
-		return array_last($this->renderingStack);
+	protected function getCurrentRendering(): ?array {
+		return array_last($this->renderingStack) ?: null;
 	}
 	
 	/**

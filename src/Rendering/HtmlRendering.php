@@ -29,16 +29,16 @@ class HtmlRendering extends Rendering {
 	/**
 	 * The default theme to use for $theme
 	 *
-	 * @var string
+	 * @var string|null
 	 */
-	public static string $defaultTheme;
+	public static ?string $defaultTheme = null;
 	
 	/**
 	 * The current global rendering
 	 *
 	 * @var Rendering
 	 */
-	protected static Rendering $current;
+	protected static $current = null;
 	
 	/**
 	 * List of CSS Urls to load
@@ -83,16 +83,16 @@ class HtmlRendering extends Rendering {
 	public string $layoutsPath = 'layouts/';
 	
 	/** @var int */
-	public $renderingId = 0;
+	public int $renderingId = 0;
 	
 	/** @var string */
-	public ?string $resourcePath;
+	public ?string $resourcePath = null;
 	
 	/** @var string */
-	public string $themeFolderUri;
+	public ?string $themeFolderUri = null;
 	
 	/** @var bool */
-	public $remote = true;
+	public bool $remote = true;
 	
 	/**
 	 * The theme to use to render HTML layouts
