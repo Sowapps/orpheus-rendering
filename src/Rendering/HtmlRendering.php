@@ -1,6 +1,7 @@
 <?php
 /**
- * HTMLRendering
+ * @author Florent HAZARD <f.hazard@sowapps.com>
+ * @var string ACCESS_PATH
  */
 
 namespace Orpheus\Rendering;
@@ -13,18 +14,14 @@ use Orpheus\Config\IniConfig;
  *
  * A basic class to render HTML using PHP scripts.
  */
-class HTMLRendering extends Rendering {
+class HtmlRendering extends Rendering {
 	
 	/**
-	 * LINK_TYPE_PLUGIN
-	 *
 	 * @var integer
 	 */
 	const LINK_TYPE_PLUGIN = 1;
 	
 	/**
-	 * LINK_TYPE_CUSTOM
-	 *
 	 * @var integer
 	 */
 	const LINK_TYPE_CUSTOM = 2;
@@ -34,72 +31,65 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @var string
 	 */
-	public static $defaultTheme;
-	
-	/**
-	 * The default model to show
-	 *
-	 * @var string
-	 */
-	protected static $SHOWMODEL = 'page_skeleton';
+	public static string $defaultTheme;
 	
 	/**
 	 * The current global rendering
 	 *
 	 * @var Rendering
 	 */
-	protected static $current;
+	protected static Rendering $current;
 	
 	/**
 	 * List of CSS Urls to load
 	 *
 	 * @var array
 	 */
-	public $cssURLs = [];
+	public array $cssURLs = [];
 	
 	/**
 	 * List of JS Urls to load
 	 *
 	 * @var array
 	 */
-	public $jsURLs = [];
+	public array $jsURLs = [];
 	
 	/**
 	 * List of meta-properties to send
 	 *
 	 * @var array
 	 */
-	public $metaprop = [];
+	public array $metaprop = [];
 	
 	/**
 	 * Path to css folder
 	 *
 	 * @var string
 	 */
-	public $cssPath = 'css/';
+	public string $cssPath = 'css/';
 	
 	/**
 	 * Path to js folder
 	 *
 	 * @var string
 	 */
-	public $jsPath = 'js/';
+	public string $jsPath = 'js/';
 	
 	/**
 	 * Path to layouts folder
 	 *
 	 * @var string
 	 */
-	public $layoutsPath = 'layouts/';
+	public string $layoutsPath = 'layouts/';
 	
 	/** @var int */
 	public $renderingId = 0;
 	
 	/** @var string */
-	public $resourcePath = ACCESSPATH;
+	public ?string $resourcePath;
 	
 	/** @var string */
-	public $themeFolderUri;
+	public string $themeFolderUri;
 	
 	/** @var bool */
 	public $remote = true;
@@ -112,7 +102,7 @@ class HTMLRendering extends Rendering {
 	protected $theme;
 	
 	public function __construct() {
-		parent::__construct();
+		$this->resourcePath = ACCESS_PATH;
 		$this->theme = static::getDefaultTheme();
 	}
 	
@@ -121,10 +111,11 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @return string $theme
 	 */
-	public static function getDefaultTheme() {
+	public static function getDefaultTheme(): string {
 		if( !static::$defaultTheme ) {
 			static::$defaultTheme = IniConfig::get('default_html_theme', 'default');
 		}
+		
 		return static::$defaultTheme;
 	}
 	
@@ -133,7 +124,7 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @param string $theme
 	 */
-	public static function setDefaultTheme($theme) {
+	public static function setDefaultTheme(string $theme) {
 		static::$defaultTheme = $theme;
 	}
 	
@@ -143,7 +134,7 @@ class HTMLRendering extends Rendering {
 	 * @param string $filename
 	 * @param string $type
 	 */
-	public function addCssFile($filename, $type = null) {
+	public function addCssFile(string $filename, ?string $type = null) {
 		$this->addThemeCssFile($filename, $type);
 	}
 	
@@ -153,7 +144,7 @@ class HTMLRendering extends Rendering {
 	 * @param string $filename
 	 * @param string $type
 	 */
-	public function addThemeCssFile($filename, $type = null) {
+	public function addThemeCssFile(string $filename, ?string $type = null) {
 		$this->addCssUrl(($this->isRemote() ? $this->getCssUrl() : $this->getCssPath()) . $filename, $type);
 	}
 	
@@ -163,7 +154,7 @@ class HTMLRendering extends Rendering {
 	 * @param string $url
 	 * @param string $type
 	 */
-	public function addCssUrl($url, $type = null) {
+	public function addCssUrl(string $url, ?string $type = null) {
 		static::addTypedUrl($this->cssURLs, $url, $type);
 	}
 	
@@ -172,9 +163,9 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @param array $array
 	 * @param string $url
-	 * @param string $type
+	 * @param string|null $type
 	 */
-	protected static function addTypedUrl(&$array, $url, $type = null) {
+	protected static function addTypedUrl(array &$array, string $url, ?string $type = null) {
 		if( !$type ) {
 			$type = self::LINK_TYPE_CUSTOM;
 		}
@@ -187,24 +178,17 @@ class HTMLRendering extends Rendering {
 	/**
 	 * @return bool
 	 */
-	public function isRemote() {
+	public function isRemote(): bool {
 		return $this->remote;
 	}
 	
 	/**
 	 * @param bool $remote
 	 */
-	public function setRemote($remote) {
+	public function setRemote(bool $remote): self {
 		$this->remote = $remote;
-	}
-	
-	/**
-	 * Get the CSS files url
-	 *
-	 * @return string The CSS url
-	 */
-	public function getCssUrl() {
-		return $this->getThemeUrl() . $this->cssPath;
+		
+		return $this;
 	}
 	
 	/**
@@ -212,8 +196,8 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @return string
 	 */
-	public function getThemeUrl() {
-		return $this->getThemeFolderUri() . '/' . $this->theme . '/';
+	public function getThemeUrl(): string {
+		return $this->getThemeFolderUri() . '/' . $this->theme;
 	}
 	
 	/**
@@ -222,7 +206,7 @@ class HTMLRendering extends Rendering {
 	 * @return string
 	 * @throws Exception
 	 */
-	public function getThemeFolderUri() {
+	public function getThemeFolderUri(): string {
 		if( !$this->themeFolderUri ) {
 			if( defined('THEMES_URL') ) {
 				$this->themeFolderUri = THEMES_URL;
@@ -234,14 +218,17 @@ class HTMLRendering extends Rendering {
 				throw new Exception('No theme folder URI provided, please use setThemeFolderUri or define THEMES_URL');
 			}
 		}
+		
 		return $this->themeFolderUri;
 	}
 	
 	/**
 	 * @param string $themeFolderUri
 	 */
-	public function setThemeFolderUri($themeFolderUri) {
+	public function setThemeFolderUri(string $themeFolderUri): self {
 		$this->themeFolderUri = $themeFolderUri;
+		
+		return $this;
 	}
 	
 	/**
@@ -249,8 +236,17 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @return string The css theme path
 	 */
-	public function getCssPath() {
+	public function getCssPath(): string {
 		return $this->getThemePath() . $this->cssPath;
+	}
+	
+	/**
+	 * Get the CSS files url
+	 *
+	 * @return string The CSS url
+	 */
+	public function getCssUrl(): string {
+		return $this->getThemeUrl() . '/' . $this->cssPath;
 	}
 	
 	/**
@@ -260,22 +256,24 @@ class HTMLRendering extends Rendering {
 	 *
 	 * Get the path to the current theme.
 	 */
-	public function getThemePath() {
+	public function getThemePath(): string {
 		return $this->getResourcePath() . THEMES_FOLDER . '/' . $this->theme . '/';
 	}
 	
 	/**
 	 * @return string
 	 */
-	public function getResourcePath() {
+	public function getResourcePath(): string {
 		return $this->resourcePath;
 	}
 	
 	/**
 	 * @param string $resourcePath
+	 * @return HtmlRendering
 	 */
-	public function setResourcePath(string $resourcePath) {
+	public function setResourcePath(string $resourcePath): HtmlRendering {
 		$this->resourcePath = $resourcePath;
+		
 		return $this;
 	}
 	
@@ -283,10 +281,13 @@ class HTMLRendering extends Rendering {
 	 * Add a theme js file to the list
 	 *
 	 * @param string $filename
-	 * @param string $type
+	 * @param string|null $type
+	 * @return HtmlRendering
 	 */
-	public function addThemeJsFile($filename, $type = null) {
+	public function addThemeJsFile(string $filename, ?string $type = null): self {
 		$this->addJsUrl(($this->isRemote() ? $this->getJsUrl() : $this->getJsPath()) . $filename, $type);
+		
+		return $this;
 	}
 	
 	/**
@@ -294,9 +295,12 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @param string $url
 	 * @param string $type
+	 * @return HtmlRendering
 	 */
-	public function addJsUrl($url, $type = null) {
+	public function addJsUrl($url, $type = null): self {
 		static::addTypedUrl($this->jsURLs, $url, $type);
+		
+		return $this;
 	}
 	
 	/**
@@ -304,8 +308,8 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @return string The JS url
 	 */
-	public function getJsUrl() {
-		return $this->getThemeUrl() . $this->jsPath;
+	public function getJsUrl(): string {
+		return $this->getThemeUrl() . '/' . $this->jsPath;
 	}
 	
 	/**
@@ -313,7 +317,7 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @return string The JS theme path
 	 */
-	public function getJsPath() {
+	public function getJsPath(): string {
 		return $this->getThemePath() . $this->jsPath;
 	}
 	
@@ -321,10 +325,13 @@ class HTMLRendering extends Rendering {
 	 * Add a global js file to the list
 	 *
 	 * @param string $filename
-	 * @param string $type
+	 * @param string|null $type
+	 * @return HtmlRendering
 	 */
-	public function addJsFile($filename, $type = null) {
+	public function addJsFile(string $filename, ?string $type = null): self {
 		$this->addJsUrl(JS_URL . '/' . $filename, $type);
+		
+		return $this;
 	}
 	
 	/**
@@ -333,8 +340,34 @@ class HTMLRendering extends Rendering {
 	 * @param string $property
 	 * @param string $content
 	 */
-	public function addMetaProperty($property, $content) {
+	public function addMetaProperty(string $property, string $content) {
 		$this->metaprop[$property] = $content;
+	}
+	
+	/**
+	 * List urls by $type in $array
+	 *
+	 * @param array $array
+	 * @param string|null $type
+	 * @return array
+	 */
+	protected static function listTypedUrl(array &$array, ?string $type = null): array {
+		if( $type ) {
+			if( !isset($array[$type]) ) {
+				return [];
+			}
+			$r = $array[$type];
+			unset($array[$type]);
+			
+			return $r;
+		}
+		$r = [];
+		foreach( $array as $type => $typeURLs ) {
+			$r = array_merge($r, $typeURLs);
+		}
+		$array = [];
+		
+		return $r;
 	}
 	
 	/**
@@ -343,32 +376,8 @@ class HTMLRendering extends Rendering {
 	 * @param string $type
 	 * @return array
 	 */
-	public function listCssUrls($type = null) {
+	public function listCssUrls($type = null): array {
 		return $this->listTypedUrl($this->cssURLs, $type);
-	}
-	
-	/**
-	 * List urls by $type in $array
-	 *
-	 * @param array $array
-	 * @param string $type
-	 * @return array
-	 */
-	protected static function listTypedUrl(&$array, $type = null) {
-		if( $type ) {
-			if( !isset($array[$type]) ) {
-				return [];
-			}
-			$r = $array[$type];
-			unset($array[$type]);
-			return $r;
-		}
-		$r = [];
-		foreach( $array as $type => $typeURLs ) {
-			$r = array_merge($r, $typeURLs);
-		}
-		$array = [];
-		return $r;
 	}
 	
 	/**
@@ -377,7 +386,7 @@ class HTMLRendering extends Rendering {
 	 * @param string $type
 	 * @return array
 	 */
-	public function listJsUrls($type = null) {
+	public function listJsUrls($type = null): array {
 		return static::listTypedUrl($this->jsURLs, $type);
 	}
 	
@@ -386,7 +395,7 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @return array
 	 */
-	public function listMetaProperties() {
+	public function listMetaProperties(): array {
 		return $this->metaprop;
 	}
 	
@@ -395,7 +404,7 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @param string $theme
 	 */
-	public function setTheme($theme) {
+	public function setTheme(string $theme) {
 		$this->theme = $theme;
 	}
 	
@@ -405,19 +414,10 @@ class HTMLRendering extends Rendering {
 	 * @return string The theme path.
 	 *
 	 * Get the absolute path to the current theme.
+	 * @throws Exception
 	 */
-	public function getAbsThemePath() {
+	public function getAbsThemePath(): string {
 		return pathOf($this->getThemePath());
-	}
-	
-	/**
-	 * Get the models theme path
-	 *
-	 * @return string The models theme path
-	 * @deprecated Use getLayoutsPath()
-	 */
-	public function getModelsPath() {
-		return $this->getLayoutsPath();
 	}
 	
 	/**
@@ -425,46 +425,24 @@ class HTMLRendering extends Rendering {
 	 *
 	 * @return string The models theme path
 	 */
-	public function getLayoutsPath() {
+	public function getLayoutsPath(): string {
 		return $this->getThemePath() . $this->layoutsPath;
 	}
 	
 	/**
 	 * @return int
 	 */
-	public function getRenderingId() {
+	public function getRenderingId(): int {
 		return $this->renderingId;
-	}
-	
-	/**
-	 * Render the given report as HTML
-	 *
-	 * @param string $report
-	 * @param string $domain
-	 * @param string $type
-	 * @param string $stream
-	 * @return string
-	 */
-	public static function renderReport($report, $domain, $type, $stream) {
-		$report = nl2br($report);
-		$rendering = new static();
-		if( $rendering->existsLayoutPath('report-' . $type) ) {
-			return $rendering->render('report-' . $type, ['Report' => $report, 'Domain' => $domain, 'Type' => $type, 'Stream' => $stream]);
-		}
-		if( $rendering->existsLayoutPath('report') ) {
-			return $rendering->render('report', ['Report' => $report, 'Domain' => $domain, 'Type' => $type, 'Stream' => $stream]);
-		}
-		return '
-		<div class="report report_' . $stream . ' ' . $type . ' ' . $domain . '">' . nl2br($report) . '</div>';
 	}
 	
 	/**
 	 * Test if the layout exists
 	 *
 	 * @param string $layout
-	 * @return string
+	 * @return bool
 	 */
-	public function existsLayoutPath($layout) {
+	public function existsLayoutPath(string $layout): bool {
 		return is_readable($this->getLayoutPath($layout));
 	}
 	
@@ -474,17 +452,17 @@ class HTMLRendering extends Rendering {
 	 * @param string $layout
 	 * @return string
 	 */
-	public function getLayoutPath($layout) {
+	public function getLayoutPath(string $layout): string {
 		return is_readable($layout) ? $layout : $this->getLayoutsPath() . $layout . '.php';
 	}
 	
 	/**
-	 *
-	 * {@inheritDoc}
-	 * @param string $layout The model to use, default use is defined by child
+	 * @param null $layout The model to use, default use is defined by child
 	 * @param array $env An environment variable, commonly an array but depends on the rendering class used
+	 * @return string|null
+	 * @throws Exception
 	 */
-	public function render($layout = null, $env = []) {
+	public function render(?string $layout = null, array $env = []): ?string {
 		static::captureOutput();
 		$success = false;
 		try {
@@ -493,17 +471,18 @@ class HTMLRendering extends Rendering {
 		} finally {
 			$contents = static::endCapture();
 		}
+		
 		return $success ? $contents : null;
 	}
 	
 	/**
 	 * Display the model, allow an absolute path to the template file.
 	 *
-	 * {@inheritDoc}
-	 * @param string $layout The model to use
+	 * @param string|null $layout The model to use
 	 * @param array $env An environment variable
+	 * @throws Exception
 	 */
-	public function display($layout = null, $env = []) {
+	public function display(?string $layout = null, array $env = []) {
 		if( !$layout ) {
 			throw new Exception('Invalid Rendering Model');
 		}

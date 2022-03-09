@@ -1,11 +1,12 @@
 <?php
 /**
- * Rendering
+ * @author Florent HAZARD <f.hazard@sowapps.com>
  */
 
 namespace Orpheus\Rendering;
 
 use Exception;
+use Orpheus\Config\Config;
 use Orpheus\Config\IniConfig;
 use Orpheus\InputController\HttpController\HttpRequest;
 use Orpheus\InputController\HttpController\HttpRoute;
@@ -19,58 +20,42 @@ use Orpheus\Rendering\Menu\MenuItem;
 abstract class Rendering {
 	
 	/**
-	 * The default model to show
-	 *
-	 * @var string
-	 */
-	protected static $SHOWMODEL = 'show';
-	
-	/**
-	 * The current Rendering
-	 *
-	 * @var Rendering
-	 */
-	protected static $rendering;
-	
-	/**
-	 * The configuration of the menu
-	 *
-	 * @var array
-	 */
-	protected static $menusConf;
-	/**
 	 * The current global rendering
 	 *
 	 * @var Rendering
 	 */
-	protected static $current;
+	protected static Rendering $current;
+	
+	/**
+	 * The configuration of the menu
+	 *
+	 * @var Config
+	 */
+	protected static Config $menusConfig;
+	
 	/**
 	 * The rendering layout stack
 	 *
 	 * @var array
 	 */
-	protected static $layoutStack = [];
+	protected static array $layoutStack = [];
 	
 	/**
 	 * The current rendering stack
 	 *
 	 * @var array
 	 */
-	protected $renderingStack = [];
-	
-	public function __construct() {
-	}
+	protected array $renderingStack = [];
 	
 	/**
 	 * Show the $menu
 	 *
 	 * @param string $menu The menu name
-	 * @param string $layout the layout to use
-	 * @param string $activeLink Active item link
+	 * @param string|null $layout the layout to use
+	 * @param string|null $activeLink Active item link
 	 * @throws Exception
 	 */
-	public function showMenu($menu, $layout = null, $activeLink = null) {
-		
+	public function showMenu(string $menu, ?string $layout = null, ?string $activeLink = null) {
 		if( $layout === null ) {
 			$layout = defined('LAYOUT_MENU') ? LAYOUT_MENU : 'menu-default';
 		}
@@ -136,40 +121,38 @@ abstract class Rendering {
 	 *
 	 * @param string $menu The menu to get items
 	 * @return string[] The menu items
+	 * @throws Exception
 	 */
-	public function getMenuItems($menu) {
-		if( !isset(self::$menusConf) ) {
-			self::$menusConf = IniConfig::build('menus', true);
+	public function getMenuItems($menu): array {
+		if( !isset(self::$menusConfig) ) {
+			self::$menusConfig = IniConfig::build('menus', true);
 		}
-		if( empty(self::$menusConf) || empty(self::$menusConf->$menu) ) {
+		if( empty(self::$menusConfig) || empty(self::$menusConfig->$menu) ) {
 			return [];
 		}
-		return self::$menusConf->$menu;
+		
+		return self::$menusConfig->$menu;
 	}
 	
 	/**
 	 * Display rendering
 	 *
-	 * @param string $layout The layout to use
+	 * @param string|null $layout The layout to use
 	 * @param array $env An environment variable
-	 *
-	 * Display the model rendering using $env.
 	 */
-	public function display($layout = null, $env = []) {
+	public function display(?string $layout = null, array $env = []) {
 		echo $this->render($layout, $env);
 	}
 	
 	/**
 	 * Render the model
-	 *
-	 * @param string $layout The layout to use, default use is defined by child
-	 * @param array $env An environment variable, commonly an array but depends on the rendering class used
-	 * @return string The generated rendering.
-	 *
-	 * Render the model using $env.
 	 * This function does not display the result, see display().
+	 *
+	 * @param string|null $layout The layout to use, default use is defined by child
+	 * @param array $env An environment variable, commonly an array but depends on the rendering class used
+	 * @return string|null The generated rendering
 	 */
-	public abstract function render($layout = null, $env = []);
+	public abstract function render(?string $layout = null, array $env = []): ?string;
 	
 	/**
 	 * Push rendering to stack
@@ -177,7 +160,7 @@ abstract class Rendering {
 	 * @param string $layout
 	 * @param array $env
 	 */
-	protected function pushToStack($layout, $env) {
+	protected function pushToStack(string $layout, array $env) {
 		$this->renderingStack[] = [$layout, $env];
 	}
 	
@@ -186,7 +169,7 @@ abstract class Rendering {
 	 *
 	 * @return array array($layout, $env);
 	 */
-	protected function getCurrentRendering() {
+	protected function getCurrentRendering(): array {
 		return array_last($this->renderingStack);
 	}
 	
@@ -195,72 +178,6 @@ abstract class Rendering {
 	 */
 	protected function pullFromStack() {
 		array_pop($this->renderingStack);
-	}
-	
-	/**
-	 * Call the show function
-	 *
-	 * @see show()
-	 *
-	 * Calls the show function using the 'default_rendering' configuration.
-	 * We should not use it anymore
-	 */
-	final public static function doShow() {
-		static::$current->show();
-	}
-	
-	/**
-	 * Show the rendering using a child rendering class
-	 *
-	 * @param array $env An environment variable
-	 * @attention Require the use of a child class, you can not instantiate this one
-	 *
-	 * Show the $SHOWMODEL rendering using the child class.
-	 * A call to this function terminate the running script.
-	 * Default is the global environment.
-	 */
-	private static function show($env = null) {
-		if( !isset($env) ) {
-			$env = $GLOBALS;
-		}
-		
-		static::$current->display(static::$SHOWMODEL, $env);
-		
-		exit();
-	}
-	
-	/**
-	 * Call the render function
-	 *
-	 * @param string $layout The model to use
-	 * @param array $env An environment variable
-	 * @return string The generated rendering
-	 * @see render()
-	 *
-	 * Call the render function using the 'default_rendering' configuration.
-	 * We should not use it anymore
-	 */
-	final public static function doRender($layout = null, $env = []) {
-		return static::$current->render($layout, $env);
-	}
-	
-	/**
-	 * Call the display function
-	 *
-	 * @param string $layout The model to use. Default value is null (behavior depending on renderer)
-	 * @param array $env An array containing environment variables. Default value is null ($GLOBALS)
-	 * @return boolean
-	 * @see display()
-	 *
-	 * Calls the display function using the 'default_rendering' configuration.
-	 * We should not use it anymore
-	 */
-	final public static function doDisplay($layout = null, $env = null) {
-		if( $env === null ) {
-			$env = $GLOBALS;
-		}
-		static::$current->display($layout, $env);
-		return true;
 	}
 	
 	/**
@@ -274,7 +191,7 @@ abstract class Rendering {
 	 * Warning: According to the ob_start() documentation, you can't call functions using output buffering in your layout.
 	 * http://www.php.net/manual/en/function.ob-start.php#refsect1-function.ob-start-parameters
 	 */
-	public function useLayout($layout, $block = 'content') {
+	public function useLayout(string $layout, string $block = 'content') {
 		static::$layoutStack[] = (object) ['layout' => $layout, 'block' => $block, 'caughtBlocks' => []];
 		static::captureOutput();
 	}
@@ -289,10 +206,10 @@ abstract class Rendering {
 	/**
 	 * Start new block capture
 	 *
-	 * @param $name
+	 * @param string $name
 	 * @throws Exception
 	 */
-	public function startNewBlock($name) {
+	public function startNewBlock(string $name) {
 		//End current block
 		$result = static::endCapture();// Ends and returns
 		$capture = array_last(static::$layoutStack);
@@ -308,12 +225,13 @@ abstract class Rendering {
 	/**
 	 * End capture of buffer
 	 *
-	 * @return bool|false|string
+	 * @return bool|string
 	 */
 	public static function endCapture() {
 		if( ob_get_level() < 1 ) {
 			return false;
 		}
+		
 		return ob_get_clean();
 	}
 	
@@ -323,7 +241,7 @@ abstract class Rendering {
 	 * @param array $env The environment to render the layout
 	 * @return boolean False if there is no current layout
 	 */
-	public function endCurrentLayout($env = []) {
+	public function endCurrentLayout(array $env = []): bool {
 		if( !ob_get_level() || empty(static::$layoutStack) ) {
 			return false;
 		}
@@ -331,6 +249,7 @@ abstract class Rendering {
 		$capture = array_pop(static::$layoutStack);
 		$capture->caughtBlocks[$capture->block] = $result;
 		$this->display($capture->layout, $capture->caughtBlocks + $env);
+		
 		return true;
 	}
 	
@@ -341,6 +260,7 @@ abstract class Rendering {
 		if( !static::$current ) {
 			static::$current = new static();
 		}
+		
 		return static::$current;
 	}
 	
