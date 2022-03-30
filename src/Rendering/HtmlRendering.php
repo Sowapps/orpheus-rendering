@@ -1,13 +1,13 @@
 <?php
 /**
  * @author Florent HAZARD <f.hazard@sowapps.com>
- * @var string ACCESS_PATH
  */
 
 namespace Orpheus\Rendering;
 
 use Exception;
 use Orpheus\Config\IniConfig;
+use RuntimeException;
 
 /**
  * The HTML rendering class
@@ -480,11 +480,10 @@ class HtmlRendering extends Rendering {
 	 *
 	 * @param string|null $layout The model to use
 	 * @param array $env An environment variable
-	 * @throws Exception
 	 */
 	public function display(?string $layout = null, array $env = []) {
 		if( !$layout ) {
-			throw new Exception('Invalid Rendering Model');
+			throw new RuntimeException('Invalid Rendering Model');
 		}
 		$this->renderingId++;
 		$rendering = $this->getCurrentRendering();
@@ -500,14 +499,11 @@ class HtmlRendering extends Rendering {
 		// Variable for included template
 		$rendering = $this;
 		
-		$interrupted = false;
+		$interrupted = true;
 		try {
 			// Store this to end layouts, static because ob_* functions are globals
 			include $this->getLayoutPath($layout);
-		} catch( Exception $e ) {
-			// Exception interrupts all layout's stack and only this rendering stack
-			$interrupted = true;
-			throw $e;
+			$interrupted = false;
 		} finally {
 			$this->pullFromStack();
 			$currentLayouts = count(static::$layoutStack);
@@ -517,7 +513,7 @@ class HtmlRendering extends Rendering {
 				if( $result ) {
 					$currentLayouts--;
 				} else {
-					// In fact, there is not more capture in progress
+					// In fact, there is no more capture in progress
 					break;
 				}
 			}
