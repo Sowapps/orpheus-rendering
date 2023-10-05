@@ -7,22 +7,18 @@
 	],
 	"autoload" : {
 		"psr-4" : {
-			"Orpheus\\" : "src"
-		},
-		"files" : [
-			"src/_loader.php"
-		]
+			"Orpheus\\" : "src/"
+		}
 	},
 	"require" : {
-	  "orpheus/orpheus-core": "1.*",
-	  "orpheus/orpheus-hook": "1.*"
+	  "orpheus/orpheus-core": "^4.0.0"
 	},
 	"type" : "library",
 	"license" : "MIT",
 	"authors" : [{
 			"name" : "Florent HAZARD",
 			"email" : "contact@sowapps.com",
-			"homepage" : "http://sowapps.com",
+			"homepage" : "https://sowapps.com",
 			"role" : "Developer"
 		}
 	]

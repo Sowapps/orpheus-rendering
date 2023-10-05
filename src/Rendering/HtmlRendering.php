@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ALL */
 /**
  * @author Florent HAZARD <f.hazard@sowapps.com>
  */
@@ -38,7 +38,7 @@ class HtmlRendering extends Rendering {
 	 *
 	 * @var Rendering
 	 */
-	protected static $current = null;
+	protected static Rendering $current;
 	
 	/**
 	 * List of CSS Urls to load
@@ -66,21 +66,21 @@ class HtmlRendering extends Rendering {
 	 *
 	 * @var string
 	 */
-	public string $cssPath = 'css/';
+	public string $cssPath = '/css';
 	
 	/**
 	 * Path to js folder
 	 *
 	 * @var string
 	 */
-	public string $jsPath = 'js/';
+	public string $jsPath = '/js';
 	
 	/**
 	 * Path to layouts folder
 	 *
 	 * @var string
 	 */
-	public string $layoutsPath = 'layouts/';
+	public string $layoutsPath = '/layouts';
 	
 	/** @var int */
 	public int $renderingId = 0;
@@ -145,6 +145,9 @@ class HtmlRendering extends Rendering {
 	 * @param string $type
 	 */
 	public function addThemeCssFile(string $filename, ?string $type = null) {
+		if( $filename[0] !== '/' ) {
+			$filename = '/' . $filename;
+		}
 		$this->addCssUrl(($this->isRemote() ? $this->getCssUrl() : $this->getCssPath()) . $filename, $type);
 	}
 	
@@ -204,7 +207,6 @@ class HtmlRendering extends Rendering {
 	 * Get Theme folder Url. Mainly, a http URL for a website.
 	 *
 	 * @return string
-	 * @throws Exception
 	 */
 	public function getThemeFolderUri(): string {
 		if( !$this->themeFolderUri ) {
@@ -215,7 +217,7 @@ class HtmlRendering extends Rendering {
 				$this->themeFolderUri = THEMESURL;
 				
 			} else {
-				throw new Exception('No theme folder URI provided, please use setThemeFolderUri or define THEMES_URL');
+				throw new RuntimeException('No theme folder URI provided, please use setThemeFolderUri or define THEMES_URL');
 			}
 		}
 		
@@ -246,7 +248,7 @@ class HtmlRendering extends Rendering {
 	 * @return string The CSS url
 	 */
 	public function getCssUrl(): string {
-		return $this->getThemeUrl() . '/' . $this->cssPath;
+		return $this->getThemeUrl() . $this->cssPath;
 	}
 	
 	/**
@@ -257,7 +259,7 @@ class HtmlRendering extends Rendering {
 	 * Get the path to the current theme.
 	 */
 	public function getThemePath(): string {
-		return $this->getResourcePath() . THEMES_FOLDER . '/' . $this->theme . '/';
+		return $this->getResourcePath() . THEMES_FOLDER . '/' . $this->theme;
 	}
 	
 	/**
@@ -285,6 +287,9 @@ class HtmlRendering extends Rendering {
 	 * @return HtmlRendering
 	 */
 	public function addThemeJsFile(string $filename, ?string $type = null): self {
+		if( $filename[0] !== '/' ) {
+			$filename = '/' . $filename;
+		}
 		$this->addJsUrl(($this->isRemote() ? $this->getJsUrl() : $this->getJsPath()) . $filename, $type);
 		
 		return $this;
@@ -309,7 +314,7 @@ class HtmlRendering extends Rendering {
 	 * @return string The JS url
 	 */
 	public function getJsUrl(): string {
-		return $this->getThemeUrl() . '/' . $this->jsPath;
+		return $this->getThemeUrl() . $this->jsPath;
 	}
 	
 	/**
@@ -340,7 +345,7 @@ class HtmlRendering extends Rendering {
 	 * @param string $property
 	 * @param string $content
 	 */
-	public function addMetaProperty(string $property, string $content) {
+	public function addMetaProperty(string $property, string $content): void {
 		$this->metaprop[$property] = $content;
 	}
 	
@@ -453,7 +458,7 @@ class HtmlRendering extends Rendering {
 	 * @return string
 	 */
 	public function getLayoutPath(string $layout): string {
-		return is_readable($layout) ? $layout : $this->getLayoutsPath() . $layout . '.php';
+		return is_readable($layout) ? $layout : $this->getLayoutsPath() . '/' . $layout . '.php';
 	}
 	
 	/**
@@ -481,7 +486,7 @@ class HtmlRendering extends Rendering {
 	 * @param string|null $layout The model to use
 	 * @param array $env An environment variable
 	 */
-	public function display(?string $layout = null, array $env = []) {
+	public function display(?string $layout = null, array $env = []): void {
 		if( !$layout ) {
 			throw new RuntimeException('Invalid Rendering Model');
 		}

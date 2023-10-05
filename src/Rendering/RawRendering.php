@@ -12,12 +12,7 @@ namespace Orpheus\Rendering;
  */
 class RawRendering extends Rendering {
 	
-	/**
-	 * @param $model
-	 * @param $env
-	 * @return mixed|string|null
-	 */
-	public function render($model = null, $env = []): ?string {
+	public function render(?string $layout = null, array $env = []): ?string {
 		return $env['CONTROLLER_OUTPUT'] ?? '';
 	}
 	

@@ -11,6 +11,7 @@ use Orpheus\Config\IniConfig;
 use Orpheus\InputController\HttpController\HttpRequest;
 use Orpheus\InputController\HttpController\HttpRoute;
 use Orpheus\Rendering\Menu\MenuItem;
+use RuntimeException;
 
 /**
  * The rendering class
@@ -24,7 +25,7 @@ abstract class Rendering {
 	 *
 	 * @var Rendering
 	 */
-	protected static $current = null;
+	protected static Rendering $current;
 	
 	/**
 	 * The configuration of the menu
@@ -55,9 +56,9 @@ abstract class Rendering {
 	 * @param string|null $activeLink Active item link
 	 * @throws Exception
 	 */
-	public function showMenu(string $menu, ?string $layout = null, ?string $activeLink = null) {
+	public function showMenu(string $menu, ?string $layout = null, ?string $activeLink = null): void {
 		if( $layout === null ) {
-			$layout = defined('LAYOUT_MENU') ? LAYOUT_MENU : 'menu-default';
+			$layout = 'menu.default';
 		}
 		if( $activeLink === null ) {
 			$activeLink = get_current_link();
@@ -70,6 +71,7 @@ abstract class Rendering {
 		if( !$items ) {
 			return;
 		}
+		/** @var MenuItem $item */
 		foreach( $items as $itemConf ) {
 			if( empty($itemConf) ) {
 				continue;
@@ -83,7 +85,7 @@ abstract class Rendering {
 					$env['items'] = array_merge($env['items'], call_user_func([$itemConf, 'getItemList']));
 					continue;
 				} else {
-					throw new Exception(sprintf('Special menu item but not a known function or class "%s"', $itemConf));
+					throw new RuntimeException(sprintf('Special menu item but not a known function or class "%s"', $itemConf));
 				}
 				
 			} elseif( $itemConf[0] === '#' ) {
@@ -93,7 +95,7 @@ abstract class Rendering {
 				$item = new MenuItem($itemParts[0], t($itemParts[1]));
 				
 			} else {
-				// TODO: Allow {var:value} for values, or use a YAML config ?
+				// TODO: Allow {var:value} for values, or use a Yaml config ?
 				$routeName = $itemConf;
 				
 				/* @var $route HttpRoute */
@@ -110,7 +112,7 @@ abstract class Rendering {
 		}
 		foreach( $env['items'] as $item ) {
 			if( $activeLink === $item->getLink() ) {
-				$item->setActive();
+				$item->setActive(true);
 			}
 		}
 		$this->display($layout, $env);
@@ -121,9 +123,8 @@ abstract class Rendering {
 	 *
 	 * @param string $menu The menu to get items
 	 * @return string[] The menu items
-	 * @throws Exception
 	 */
-	public function getMenuItems($menu): array {
+	public function getMenuItems(string $menu): array {
 		if( !isset(self::$menusConfig) ) {
 			self::$menusConfig = IniConfig::build('menus', true);
 		}
@@ -140,7 +141,7 @@ abstract class Rendering {
 	 * @param string|null $layout The layout to use
 	 * @param array $env An environment variable
 	 */
-	public function display(?string $layout = null, array $env = []) {
+	public function display(?string $layout = null, array $env = []): void {
 		echo $this->render($layout, $env);
 	}
 	
@@ -156,11 +157,8 @@ abstract class Rendering {
 	
 	/**
 	 * Push rendering to stack
-	 *
-	 * @param string $layout
-	 * @param array $env
 	 */
-	protected function pushToStack(string $layout, array $env) {
+	protected function pushToStack(string $layout, array $env): void {
 		$this->renderingStack[] = [$layout, $env];
 	}
 	
@@ -176,7 +174,7 @@ abstract class Rendering {
 	/**
 	 * Remove current rendering and get to previous one
 	 */
-	protected function pullFromStack() {
+	protected function pullFromStack(): void {
 		array_pop($this->renderingStack);
 	}
 	
@@ -191,7 +189,7 @@ abstract class Rendering {
 	 * Warning: According to the ob_start() documentation, you can't call functions using output buffering in your layout.
 	 * http://www.php.net/manual/en/function.ob-start.php#refsect1-function.ob-start-parameters
 	 */
-	public function useLayout(string $layout, string $block = 'content') {
+	public function useLayout(string $layout, string $block = 'content'): void {
 		static::$layoutStack[] = (object) ['layout' => $layout, 'block' => $block, 'caughtBlocks' => []];
 		static::captureOutput();
 	}
@@ -199,23 +197,20 @@ abstract class Rendering {
 	/**
 	 * Start capture of buffer
 	 */
-	public static function captureOutput() {
+	public static function captureOutput(): void {
 		ob_start();
 	}
 	
 	/**
 	 * Start new block capture
-	 *
-	 * @param string $name
-	 * @throws Exception
 	 */
-	public function startNewBlock(string $name) {
+	public function startNewBlock(string $name): void {
 		//End current block
 		$result = static::endCapture();// Ends and returns
 		$capture = array_last(static::$layoutStack);
 		if( isset($capture->caughtBlocks[$capture->block]) ) {
-			throw new Exception(sprintf('Block %s already rendered', $capture->block));
-		};
+			throw new RuntimeException(sprintf('Block %s already rendered', $capture->block));
+		}
 		$capture->caughtBlocks[$capture->block] = $result;
 		//Start new block
 		$capture->block = $name;
@@ -224,10 +219,8 @@ abstract class Rendering {
 	
 	/**
 	 * End capture of buffer
-	 *
-	 * @return bool|string
 	 */
-	public static function endCapture() {
+	public static function endCapture(): bool|string {
 		if( ob_get_level() < 1 ) {
 			return false;
 		}
@@ -253,15 +246,8 @@ abstract class Rendering {
 		return true;
 	}
 	
-	/**
-	 * @return static
-	 */
-	public static function getCurrent() {
-		if( !static::$current ) {
-			static::$current = new static();
-		}
-		
-		return static::$current;
+	public static function getCurrent(): static {
+		return static::$current ??= new static();
 	}
 	
 }

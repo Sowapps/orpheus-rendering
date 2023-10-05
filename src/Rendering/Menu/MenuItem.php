@@ -5,87 +5,66 @@ namespace Orpheus\Rendering\Menu;
 /**
  * Class MenuItem
  *
- * @package Orpheus\Rendering\Menu
  * @property bool $current
  */
 class MenuItem {
 	
-	/**
-	 * @var string
-	 */
-	protected $link;
+	protected string $link;
 	
-	/**
-	 * @var string
-	 */
-	protected $label;
+	protected string $label;
 	
-	/**
-	 * @var string
-	 */
-	protected $route;
+	protected ?string $route = null;
 	
-	/**
-	 * @var boolean
-	 */
-	protected $isActive = false;
+	protected bool $active = false;
 	
-	/**
-	 * @var boolean
-	 */
-	protected $isGroup = false;
-	
-	public function __construct($link, $label) {
+	public function __construct(string $link, string $label) {
 		$this->setLink($link);
 		$this->setLabel($label);
 	}
 	
-	public function __get($key) {
+	public function __get(string $key) {
 		if( $key === 'current' ) {
 			// Backward compatibility
-			$key = 'isActive';
+			$key = 'active';
 		}
-		return isset($this->{$key}) ? $this->{$key} : null;
+		/** @noinspection PhpExpressionAlwaysNullInspection */
+		return $this->{$key} ?? null;
 	}
 	
-	public function getLink() {
+	public function getLink(): string {
 		return $this->link;
 	}
 	
-	public function setLink($link) {
+	public function setLink(string $link): static {
 		$this->link = $link;
 		return $this;
 	}
 	
-	public function getLabel() {
+	public function getLabel(): string {
 		return $this->label;
 	}
 	
-	public function setLabel($label) {
+	public function setLabel(string $label): static {
 		$this->label = $label;
 		return $this;
 	}
 	
-	public function getRoute() {
+	public function getRoute(): ?string {
 		return $this->route;
 	}
 	
-	public function setRoute($route) {
+	public function setRoute(string $route): static {
 		$this->route = $route;
 		return $this;
 	}
 	
-	public function isActive() {
-		return $this->isActive;
+	public function isActive(): bool {
+		return $this->active;
 	}
 	
-	public function setIsActive($isActive) {
-		$this->isActive = $isActive;
+	public function setActive(bool $active): static {
+		$this->active = $active;
 		return $this;
-	}
-	
-	public function setActive() {
-		return $this->setIsActive(true);
 	}
 	
 }
